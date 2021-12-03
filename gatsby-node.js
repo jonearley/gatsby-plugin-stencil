@@ -1,11 +1,6 @@
-// @ts-check
-const util = require("util");
-const glob = util.promisify(require("glob"));
-const fs = require("fs");
+const glob = require("glob");
 
-const readFile = util.promisify(fs.readFile);
-const writeFile = util.promisify(fs.writeFile);
-
+const { hydrateFiles } = require("./src/hydrateFiles");
 /*
   Server side render Stencil web components
 */
@@ -15,43 +10,16 @@ exports.onPostBuild = async ({ reporter }, pluginOptions) => {
     packages = [pluginOptions.module];
   }
 
-  const files = await glob("public/**/*.html", { nodir: true });
-
-  const renderToStringOptions = pluginOptions.renderToStringOptions
-    ? pluginOptions.renderToStringOptions
-    : {};
-
-  async function preRenderPage(file, hydrate, pkg) {
-    try {
-      const page = await readFile(file, "utf-8");
-      const { html, diagnostics = [] } = await hydrate.renderToString(
-        page,
-        renderToStringOptions
-      );
-
-      diagnostics.forEach((diagnostic) =>
-        reporter.error(
-          `error pre-rendering file: ${file} with ${pkg}. ${JSON.stringify(
-            diagnostic,
-            null,
-            "  "
-          )}`
-        )
-      );
-
-      await writeFile(file, html);
-    } catch (e) {
-      reporter.error(
-        `error pre-rendering file: ${file} with ${pkg}. ${e.message}`
-      );
+  // Could still experience mem issues with this but would require a lot of files
+  const files = glob.sync("public/**/*.html", { nodir: true });
+  reporter.info("Stencil hydration starting");
+  for (let i = 0; i < packages.length; i++) {
+    if (files.length > 0) {
+      await hydrateFiles(files, packages[i], reporter, pluginOptions);
+    } else {
+      reporter.error("No files found to hyrdate");
     }
+    reporter.info(`Package hydrated ${packages[i]}`);
   }
-
-  async function preRenderPackage(pkg) {
-    const hydrate = require(`${pkg}/hydrate`);
-    await Promise.all(files.map((file) => preRenderPage(file, hydrate, pkg)));
-    reporter.info(`pre-rendered ${pkg}`);
-  }
-
-  return Promise.all(packages.map(preRenderPackage));
+  reporter.success("All Stencil packages hydrated");
 };
