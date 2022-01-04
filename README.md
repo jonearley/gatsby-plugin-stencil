@@ -28,6 +28,10 @@ module.exports = {
         renderToStringOptions: {
           prettyHtml: true,
         },
+        // Number of workers to spin up (optional). Will default to half the number of CPUs detected via os.cpus()
+        numberOfWorkers: 4,
+        // Number of files to pass to each worker (optional). Will default to 100
+        workerChunkSize: 100,
       },
     },
   ],
