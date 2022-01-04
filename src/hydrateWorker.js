@@ -28,6 +28,11 @@ const chunkFiles = async (files) => {
  */
 const processFile = async (file) => {
   const page = await readFile(file, "utf8");
+  // In case incremental builds are enabled and the page has already been
+  // hydrated, skip the hydration
+  if (page.includes('data-stencil-build=')) {
+    return;
+  }
   const { html, diagnostics = [] } = await hydrate.renderToString(
     page,
     renderToStringOptions
