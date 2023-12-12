@@ -17,7 +17,7 @@
   "license": "MIT",
   "main": "index.js",
   "peerDependencies": {
-    "gatsby": "^4|^5"
+    "gatsby": "4 - 6"
   },
   "devDependencies": {
     "glob": "^7.1.6"
