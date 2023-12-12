@@ -1,7 +1,7 @@
 {
   "name": "gatsby-plugin-stencil",
   "description": "Gatsby server side rendering for your Stencil web components.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Jon Earley",
   "bugs": {
     "url": "https://github.com/jonearley/gatsby-plugin-stencil/issues"
@@ -17,7 +17,7 @@
   "license": "MIT",
   "main": "index.js",
   "peerDependencies": {
-    "gatsby": "^2.0.0"
+    "gatsby": "4 - 6"
   },
   "devDependencies": {
     "glob": "^7.1.6"
